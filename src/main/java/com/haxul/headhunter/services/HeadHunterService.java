@@ -1,5 +1,6 @@
 package com.haxul.headhunter.services;
 
+import com.haxul.exchangeCurrency.services.ExchangeCurrencyService;
 import com.haxul.headhunter.entities.MarketDemand;
 import com.haxul.headhunter.exceptions.HeadHunterSalaryIsZeroException;
 import com.haxul.headhunter.exceptions.HeadHunterUnknownCurrencyException;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -23,26 +23,25 @@ import java.util.stream.Collectors;
 @Service
 public class HeadHunterService {
 
-
     private final HeadHunterRestClient headHunterRestClient;
+    private final ExchangeCurrencyService exchangeCurrencyService;
 
     @Value("${headhunter.taxRatePercentage}")
     private String taxRatePercentage;
 
-    private final double USD_TO_RUB_RATE = 79.12; // TODO fetch rate from the network
-
-    public HeadHunterService(HeadHunterRestClient headHunterRestClient) {
+    public HeadHunterService(HeadHunterRestClient headHunterRestClient, ExchangeCurrencyService exchangeCurrencyService) {
         this.headHunterRestClient = headHunterRestClient;
+        this.exchangeCurrencyService = exchangeCurrencyService;
     }
 
     public MarketDemand computeMarketDemandState(String position, City city) throws InterruptedException, ExecutionException, TimeoutException {
-        var vacanciesFuture =
-                CompletableFuture.supplyAsync(() -> headHunterRestClient.findVacancies(position, city.getId(), 0, new LinkedList<>()));
+        var vacanciesFuture = headHunterRestClient.findVacanciesAsync(position, city.getId(), 0, new LinkedList<>());
 
         MarketDemand demand = new MarketDemand();
         demand.setPosition(position);
         demand.setCity(city);
 
+        Double usdToRubRate = exchangeCurrencyService.getUsdToRubRate();
         List<VacancyItemResponse> vacancies = vacanciesFuture.get(10, TimeUnit.SECONDS);
         demand.setAmount(vacancies.size());
 
@@ -52,7 +51,7 @@ public class HeadHunterService {
 
         int allGrossSalary = 0;
         for (var vacancy : vacanciesWithSalary) {
-            allGrossSalary += getRubleAverageSalary(vacancy, USD_TO_RUB_RATE);
+            allGrossSalary += getRubleAverageSalary(vacancy, usdToRubRate);
         }
         int averageGrossSalary = allGrossSalary / vacanciesWithSalary.size();
         demand.setAverageGrossSalary(averageGrossSalary);

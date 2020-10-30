@@ -3,3 +3,7 @@ headhunter:
   cities:
     samara: 78
   taxRatePercentage: 13
+
+currency:
+  api:
+    url: https://api.exchangeratesapi.io/latest

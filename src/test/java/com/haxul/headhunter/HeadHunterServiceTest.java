@@ -1,6 +1,7 @@
 package com.haxul.headhunter;
 
 
+import com.haxul.exchangeCurrency.services.ExchangeCurrencyService;
 import com.haxul.headhunter.entities.MarketDemand;
 import com.haxul.headhunter.models.area.City;
 import com.haxul.headhunter.models.currency.Currency;
@@ -22,7 +23,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,16 +45,19 @@ public class HeadHunterServiceTest {
     @MockBean
     private HeadHunterRestClient headHunterRestClient;
 
+    @MockBean
+    private ExchangeCurrencyService exchangeCurrencyService;
+
     @BeforeEach
     public void executedBeforeEach() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void computeMarketDemandStateNetworkTest() {
+    public void computeMarketDemandStateNetworkTest() throws InterruptedException, ExecutionException, TimeoutException {
         var restClient = new HeadHunterRestClient(new RestTemplate());
         restClient.setBaseUrl(baseUrl);
-        List<VacancyItemResponse> list = restClient.findVacancies("java", City.SAMARA.getId(), 0, new LinkedList<>());
+        List<VacancyItemResponse> list = restClient.findVacanciesAsync("java", City.SAMARA.getId(), 0, new LinkedList<>()).get(5, TimeUnit.SECONDS);
         assertNotEquals(0, list.size());
     }
 
@@ -67,7 +73,9 @@ public class HeadHunterServiceTest {
 
         List<VacancyItemResponse> list = new LinkedList<>();
         list.add(vacancyItemResponse);
-        when(headHunterRestClient.findVacancies(anyString(), anyInt(), anyInt() ,anyList())).thenReturn(list);
+        var future = CompletableFuture.completedFuture(list);
+        when(headHunterRestClient.findVacanciesAsync(anyString(), anyInt(), anyInt() ,anyList())).thenReturn(future);
+        when(exchangeCurrencyService.getUsdToRubRate()).thenReturn(80.0);
         MarketDemand marketDemand = headHunterService.computeMarketDemandState("java", City.SAMARA);
         assertNotNull(marketDemand);
         assertEquals(75000, marketDemand.getAverageGrossSalary());

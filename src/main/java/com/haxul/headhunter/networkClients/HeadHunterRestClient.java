@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -24,6 +25,11 @@ public class HeadHunterRestClient {
 
     public HeadHunterRestClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+    }
+
+
+    public CompletableFuture<List<VacancyItemResponse>> findVacanciesAsync(String position, int areaId, int page, List<VacancyItemResponse> vacancies) {
+        return CompletableFuture.supplyAsync(() -> findVacancies(position, areaId, page, vacancies));
     }
 
     public List<VacancyItemResponse> findVacancies(String position, int areaId, int page, List<VacancyItemResponse> vacancies) {
