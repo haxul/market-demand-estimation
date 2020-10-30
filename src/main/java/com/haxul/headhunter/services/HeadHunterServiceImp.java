@@ -38,7 +38,7 @@ public class HeadHunterServiceImp implements HeadHunterService {
 
     @Override
     public MarketDemand computeMarketDemandState(String position, int areaId) {
-        List<VacancyItemResponse> vacancies = findVacanciesWithSalary(position, areaId, 0, new LinkedList<>());
+        List<VacancyItemResponse> vacancies = findVacancies(position, areaId, 0, new LinkedList<>());
         MarketDemand demand = new MarketDemand();
         demand.setPosition(position);
         demand.setCity(City.SAMARA);
@@ -96,14 +96,14 @@ public class HeadHunterServiceImp implements HeadHunterService {
 
 
 
-    private List<VacancyItemResponse> findVacanciesWithSalary(String position, int areaId, int page, List<VacancyItemResponse> vacanciesWithSalary) {
+    private List<VacancyItemResponse> findVacancies(String position, int areaId, int page, List<VacancyItemResponse> vacancies) {
         try {
             final String url = baseUrl + "vacancies?text=\"" + position + "\"&area=" + areaId + "&page=" + page;
             VacanciesResponse response = restTemplate.getForObject(url, VacanciesResponse.class);
             if (response == null) throw new HeadHunterWrongResponseException("vacanciesResponse is null");
-            vacanciesWithSalary.addAll(response.getItems());
-            if (response.getPages() == page + 1) return vacanciesWithSalary;
-            return findVacanciesWithSalary(position, areaId, ++page, vacanciesWithSalary);
+            vacancies.addAll(response.getItems());
+            if (response.getPages() == page + 1) return vacancies;
+            return findVacancies(position, areaId, ++page, vacancies);
         } catch (Exception e) {
             log.error("HeadHunterService error: " + e);
             throw new HeadHunterWrongResponseException(e.getMessage());
