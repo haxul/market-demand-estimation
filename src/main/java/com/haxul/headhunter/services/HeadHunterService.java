@@ -38,7 +38,7 @@ public class HeadHunterService {
         List<VacancyItemResponse> vacancies = headHunterRestClient.findVacancies(position, city.getId(), 0, new LinkedList<>());
         MarketDemand demand = new MarketDemand();
         demand.setPosition(position);
-        demand.setCity(City.SAMARA);
+        demand.setCity(city);
         demand.setAmount(vacancies.size());
 
         List<VacancyItemResponse> vacanciesWithSalary = vacancies.stream()
