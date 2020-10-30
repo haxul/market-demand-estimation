@@ -3,23 +3,20 @@ package com.haxul.headhunter.services;
 import com.haxul.headhunter.entities.MarketDemand;
 import com.haxul.headhunter.exceptions.HeadHunterSalaryIsZeroException;
 import com.haxul.headhunter.exceptions.HeadHunterUnknownCurrencyException;
-import com.haxul.headhunter.exceptions.HeadHunterWrongResponseException;
 import com.haxul.headhunter.models.area.City;
 import com.haxul.headhunter.models.responses.SalaryVacancyResponse;
-import com.haxul.headhunter.models.responses.VacanciesResponse;
 import com.haxul.headhunter.models.responses.VacancyItemResponse;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,16 +34,15 @@ public class HeadHunterService {
         this.headHunterRestClient = headHunterRestClient;
     }
 
-    @SneakyThrows
-    public MarketDemand computeMarketDemandState(String position, City city) {
-        var vacanciesFuture = CompletableFuture.supplyAsync(() ->
-                        headHunterRestClient.findVacancies(position, city.getId(), 0, new LinkedList<>()));
+    public MarketDemand computeMarketDemandState(String position, City city) throws InterruptedException, ExecutionException, TimeoutException {
+        var vacanciesFuture =
+                CompletableFuture.supplyAsync(() -> headHunterRestClient.findVacancies(position, city.getId(), 0, new LinkedList<>()));
 
         MarketDemand demand = new MarketDemand();
         demand.setPosition(position);
         demand.setCity(city);
 
-        List<VacancyItemResponse> vacancies = vacanciesFuture.get(7, TimeUnit.SECONDS);
+        List<VacancyItemResponse> vacancies = vacanciesFuture.get(5, TimeUnit.SECONDS);
         demand.setAmount(vacancies.size());
 
         List<VacancyItemResponse> vacanciesWithSalary = vacancies.stream()
@@ -64,14 +60,14 @@ public class HeadHunterService {
         return demand;
     }
 
-    private int computeGrossSalary(final int salary,final int taxRatePercentage) {
+    private int computeGrossSalary(final int salary, final int taxRatePercentage) {
         return (salary * 100) / (100 - taxRatePercentage);
     }
 
     private int computeAverage(final SalaryVacancyResponse salary) {
-        boolean doesSalaryHasFrom =  salary.getFrom() != 0;
+        boolean doesSalaryHasFrom = salary.getFrom() != 0;
         boolean doesSalaryHasTo = salary.getTo() != 0;
-        if (doesSalaryHasFrom && doesSalaryHasTo) return  (salary.getFrom() + salary.getTo()) / 2;
+        if (doesSalaryHasFrom && doesSalaryHasTo) return (salary.getFrom() + salary.getTo()) / 2;
         if (doesSalaryHasFrom) return salary.getFrom();
         if (doesSalaryHasTo) return salary.getTo();
         throw new HeadHunterSalaryIsZeroException();
@@ -97,7 +93,5 @@ public class HeadHunterService {
 
         throw new HeadHunterUnknownCurrencyException(vacancy.getSalary().getCurrency());
     }
-
-
 
 }
