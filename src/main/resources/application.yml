@@ -1,0 +1,5 @@
+headhunter:
+  baseUrl: https://api.hh.ru/
+  cities:
+    samara: 78
+  taxRatePercentage: 13
