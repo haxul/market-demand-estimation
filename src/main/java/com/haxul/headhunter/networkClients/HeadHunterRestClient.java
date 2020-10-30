@@ -3,6 +3,7 @@ package com.haxul.headhunter.networkClients;
 import com.haxul.headhunter.exceptions.HeadHunterWrongResponseException;
 import com.haxul.headhunter.models.responses.VacanciesResponse;
 import com.haxul.headhunter.models.responses.VacancyItemResponse;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class HeadHunterRestClient {
     private final RestTemplate restTemplate;
 
     @Value("${headhunter.baseUrl}")
+    @Setter
     private String baseUrl;
 
 

@@ -1,4 +1,4 @@
-package com.haxul.headhunter.configurations;
+package com.haxul.configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

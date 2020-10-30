@@ -43,7 +43,7 @@ public class HeadHunterService {
         demand.setPosition(position);
         demand.setCity(city);
 
-        List<VacancyItemResponse> vacancies = vacanciesFuture.get();
+        List<VacancyItemResponse> vacancies = vacanciesFuture.get(10, TimeUnit.SECONDS);
         demand.setAmount(vacancies.size());
 
         List<VacancyItemResponse> vacanciesWithSalary = vacancies.stream()

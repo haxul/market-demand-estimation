@@ -13,18 +13,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -32,6 +33,8 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 public class HeadHunterServiceTest {
 
+    @Value("${headhunter.baseUrl}")
+    private String baseUrl;
 
     @Autowired
     private HeadHunterService headHunterService;
@@ -44,6 +47,13 @@ public class HeadHunterServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    @Test
+    public void computeMarketDemandStateNetworkTest() {
+        var restClient = new HeadHunterRestClient(new RestTemplate());
+        restClient.setBaseUrl(baseUrl);
+        List<VacancyItemResponse> list = restClient.findVacancies("java", City.SAMARA.getId(), 0, new LinkedList<>());
+        assertNotEquals(0, list.size());
+    }
 
     @Test
     public void computeMarkDemandStateTest() throws InterruptedException, ExecutionException, TimeoutException {
