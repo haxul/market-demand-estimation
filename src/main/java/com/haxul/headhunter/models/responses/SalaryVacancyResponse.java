@@ -1,11 +1,14 @@
 package com.haxul.headhunter.models.responses;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.haxul.headhunter.models.currency.Currency;
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SalaryVacancyResponse {
     private int from;
     private int to;
-    private String currency;
+    private Currency currency;
     private boolean gross;
 }

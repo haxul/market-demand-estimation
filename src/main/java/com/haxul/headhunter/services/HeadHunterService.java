@@ -4,6 +4,7 @@ import com.haxul.headhunter.entities.MarketDemand;
 import com.haxul.headhunter.exceptions.HeadHunterSalaryIsZeroException;
 import com.haxul.headhunter.exceptions.HeadHunterUnknownCurrencyException;
 import com.haxul.headhunter.models.area.City;
+import com.haxul.headhunter.models.currency.Currency;
 import com.haxul.headhunter.models.responses.SalaryVacancyResponse;
 import com.haxul.headhunter.models.responses.VacancyItemResponse;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
@@ -42,7 +43,7 @@ public class HeadHunterService {
         demand.setPosition(position);
         demand.setCity(city);
 
-        List<VacancyItemResponse> vacancies = vacanciesFuture.get(5, TimeUnit.SECONDS);
+        List<VacancyItemResponse> vacancies = vacanciesFuture.get();
         demand.setAmount(vacancies.size());
 
         List<VacancyItemResponse> vacanciesWithSalary = vacancies.stream()
@@ -78,20 +79,20 @@ public class HeadHunterService {
         var salary = vacancy.getSalary();
         int average = computeAverage(salary);
 
-        if (salary.getCurrency().equals("RUR")) {
+        if (Currency.RUR == salary.getCurrency()) {
             return vacancy.getSalary().isGross()
                     ? average
                     : computeGrossSalary(average, Integer.parseInt(taxRatePercentage));
         }
 
-        if (salary.getCurrency().equals("USD")) {
+        if (Currency.USD == salary.getCurrency()) {
             int averageRuble = (int) (average * usdToRub);
             return salary.isGross()
                     ? averageRuble
                     : computeGrossSalary(averageRuble, Integer.parseInt(taxRatePercentage));
         }
 
-        throw new HeadHunterUnknownCurrencyException(vacancy.getSalary().getCurrency());
+        throw new HeadHunterUnknownCurrencyException(vacancy.getSalary().getCurrency().toString());
     }
 
 }

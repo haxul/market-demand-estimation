@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * TODO market demands should depend on experience
+ * TODO market demand should contain experience
  */
 @Data
 public class MarketDemand {
