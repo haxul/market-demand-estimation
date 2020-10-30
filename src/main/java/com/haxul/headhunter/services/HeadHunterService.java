@@ -9,6 +9,7 @@ import com.haxul.headhunter.models.responses.SalaryVacancyResponse;
 import com.haxul.headhunter.models.responses.VacanciesResponse;
 import com.haxul.headhunter.models.responses.VacancyItemResponse;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,11 +37,16 @@ public class HeadHunterService {
         this.headHunterRestClient = headHunterRestClient;
     }
 
+    @SneakyThrows
     public MarketDemand computeMarketDemandState(String position, City city) {
-        List<VacancyItemResponse> vacancies = headHunterRestClient.findVacancies(position, city.getId(), 0, new LinkedList<>());
+        var vacanciesFuture = CompletableFuture.supplyAsync(() ->
+                        headHunterRestClient.findVacancies(position, city.getId(), 0, new LinkedList<>()));
+
         MarketDemand demand = new MarketDemand();
         demand.setPosition(position);
         demand.setCity(city);
+
+        List<VacancyItemResponse> vacancies = vacanciesFuture.get(7, TimeUnit.SECONDS);
         demand.setAmount(vacancies.size());
 
         List<VacancyItemResponse> vacanciesWithSalary = vacancies.stream()
