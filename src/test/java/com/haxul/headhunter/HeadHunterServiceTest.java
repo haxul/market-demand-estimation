@@ -1,16 +1,28 @@
 package com.haxul.headhunter;
 
 
+import com.haxul.headhunter.entities.MarketDemand;
+import com.haxul.headhunter.models.area.City;
 import com.haxul.headhunter.models.responses.SalaryVacancyResponse;
 import com.haxul.headhunter.models.responses.VacancyItemResponse;
+import com.haxul.headhunter.networkClients.HeadHunterRestClient;
 import com.haxul.headhunter.services.HeadHunterService;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -21,19 +33,31 @@ public class HeadHunterServiceTest {
     @Autowired
     private HeadHunterService headHunterService;
 
-//    @MockBean
-//    private TraceRepository traceRepository;
-//
-//
-//    @Before
-//    public void executedBeforeEach() {
-//        initMocks(this);
-//    }
+    @MockBean
+    private HeadHunterRestClient headHunterRestClient;
+
+    @BeforeEach
+    public void executedBeforeEach() {
+        MockitoAnnotations.openMocks(this);
+    }
 
 
     @Test
     public void computeMarkDemandStateTest() {
-        headHunterService.computeMarketDemandState("java", 78);
+        VacancyItemResponse vacancyItemResponse = new VacancyItemResponse();
+        SalaryVacancyResponse salaryVacancyResponse = new SalaryVacancyResponse();
+        vacancyItemResponse.setSalary(salaryVacancyResponse);
+        salaryVacancyResponse.setCurrency("RUR");
+        salaryVacancyResponse.setFrom(70000);
+        salaryVacancyResponse.setTo(80000);
+        salaryVacancyResponse.setGross(true);
+
+        List<VacancyItemResponse> list = new LinkedList<>();
+        list.add(vacancyItemResponse);
+        when(headHunterRestClient.findVacancies(anyString(), anyInt(), anyInt() ,anyList())).thenReturn(list);
+        MarketDemand marketDemand = headHunterService.computeMarketDemandState("java", City.SAMARA);
+        assertNotNull(marketDemand);
+        assertEquals(75000, marketDemand.getAverageGrossSalary());
     }
 
     @Test

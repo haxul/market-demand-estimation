@@ -26,6 +26,8 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.13'
+
 }
 
 test {
