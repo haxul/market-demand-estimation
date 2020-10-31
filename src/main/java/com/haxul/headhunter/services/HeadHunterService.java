@@ -45,15 +45,12 @@ public class HeadHunterService {
         List<VacancyItemResponse> vacancies = vacanciesFuture.get(10, TimeUnit.SECONDS);
         demand.setAmount(vacancies.size());
 
-        List<VacancyItemResponse> vacanciesWithSalary = vacancies.stream()
-                .filter(item -> item.getSalary() != null)
-                .collect(Collectors.toList());
-
         int allGrossSalary = 0;
-        for (var vacancy : vacanciesWithSalary) {
+        for (var vacancy : vacancies) {
             allGrossSalary += getRubleAverageSalary(vacancy, usdToRubRate);
         }
-        int averageGrossSalary = allGrossSalary / vacanciesWithSalary.size();
+
+        int averageGrossSalary = allGrossSalary / vacancies.size();
         demand.setAverageGrossSalary(averageGrossSalary);
         demand.setAtMoment(new Date());
 

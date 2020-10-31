@@ -53,6 +53,15 @@ public class HeadHunterServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
+    @Test
+    public void getDetailedVacancyDataByIdNetworkTest() {
+        var restClient = new HeadHunterRestClient(new RestTemplate());
+        restClient.setBaseUrl(baseUrl);
+        restClient.getDetailedVacancyDataById(40111404);
+    }
+
+
     @Test
     public void computeMarketDemandStateNetworkTest() throws InterruptedException, ExecutionException, TimeoutException {
         var restClient = new HeadHunterRestClient(new RestTemplate());

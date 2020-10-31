@@ -3,6 +3,7 @@ package com.haxul.headhunter.networkClients;
 import com.haxul.headhunter.exceptions.HeadHunterWrongResponseException;
 import com.haxul.headhunter.models.responses.VacanciesResponse;
 import com.haxul.headhunter.models.responses.VacancyItemResponse;
+import com.haxul.headhunter.models.responses.VacancyViewPageResponse;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,5 +47,13 @@ public class HeadHunterRestClient {
         }
     }
 
-    //TODO create method to handle experience
+    public CompletableFuture<VacancyViewPageResponse> getDetailedVacancyDataById(int id) {
+        final String url = baseUrl + "vacancies/" + id;
+        return CompletableFuture
+                .supplyAsync(() -> restTemplate.getForObject(url, VacancyViewPageResponse.class))
+                .exceptionally(e -> {
+                    log.error("HeadHunterRestClientError: " + e);
+                    return null;
+                });
+    }
 }
