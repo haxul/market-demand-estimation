@@ -34,7 +34,7 @@ public class HeadHunterRestClient {
 
     public List<VacancyItemResponse> findVacancies(String position, int areaId, int page, List<VacancyItemResponse> vacancies) {
         try {
-            final String url = baseUrl + "vacancies?text=\"" + position + "\"&area=" + areaId + "&page=" + page;
+            final String url = baseUrl + "vacancies?text=\"" + position + "\"&area=" + areaId + "&page=" + page + "&only_with_salary=true";
             VacanciesResponse response = restTemplate.getForObject(url, VacanciesResponse.class);
             if (response == null) throw new HeadHunterWrongResponseException("vacanciesResponse is null");
             vacancies.addAll(response.getItems());
@@ -45,4 +45,6 @@ public class HeadHunterRestClient {
             throw new HeadHunterWrongResponseException(e);
         }
     }
+
+    //TODO create method to handle experience
 }

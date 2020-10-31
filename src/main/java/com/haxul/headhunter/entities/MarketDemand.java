@@ -12,5 +12,5 @@ public class MarketDemand {
     private int amount;
     private Date atMoment;
     private City city;
-    private int experience;
+    private int minExperience;
 }
