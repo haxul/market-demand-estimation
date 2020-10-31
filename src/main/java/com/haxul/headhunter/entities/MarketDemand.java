@@ -5,9 +5,6 @@ import lombok.Data;
 
 import java.util.Date;
 
-/**
- * TODO market demand should contain experience
- */
 @Data
 public class MarketDemand {
     private String position;
@@ -15,4 +12,5 @@ public class MarketDemand {
     private int amount;
     private Date atMoment;
     private City city;
+    private int experience;
 }
