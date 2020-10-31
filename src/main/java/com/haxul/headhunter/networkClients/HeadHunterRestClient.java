@@ -4,6 +4,7 @@ import com.haxul.headhunter.exceptions.HeadHunterWrongResponseException;
 import com.haxul.headhunter.models.responses.VacanciesResponse;
 import com.haxul.headhunter.models.responses.VacancyItemResponse;
 import com.haxul.headhunter.models.responses.VacancyViewPageResponse;
+import com.haxul.utils.AppUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,13 +19,15 @@ import java.util.concurrent.CompletableFuture;
 public class HeadHunterRestClient {
 
     private final RestTemplate restTemplate;
+    private final AppUtils appUtils;
 
     @Value("${headhunter.baseUrl}")
     @Setter
     private String baseUrl;
 
 
-    public HeadHunterRestClient(RestTemplate restTemplate) {
+    public HeadHunterRestClient(RestTemplate restTemplate, AppUtils appUtils) {
+        this.appUtils = appUtils;
         this.restTemplate = restTemplate;
     }
 
@@ -51,9 +54,6 @@ public class HeadHunterRestClient {
         final String url = baseUrl + "vacancies/" + id;
         return CompletableFuture
                 .supplyAsync(() -> restTemplate.getForObject(url, VacancyViewPageResponse.class))
-                .exceptionally(e -> {
-                    log.error("HeadHunterRestClientError: " + e);
-                    return null;
-                });
+                .exceptionally(appUtils::handleError);
     }
 }

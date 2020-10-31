@@ -90,5 +90,4 @@ public class HeadHunterService {
 
         throw new HeadHunterUnknownCurrencyException(vacancy.getSalary().getCurrency().toString());
     }
-
 }
