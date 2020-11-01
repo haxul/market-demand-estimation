@@ -8,8 +8,8 @@ import com.haxul.headhunter.models.area.City;
 import com.haxul.headhunter.models.currency.Currency;
 import com.haxul.headhunter.models.experience.ExperienceHeadhunter;
 import com.haxul.headhunter.models.responses.SalaryHeadHunter;
-import com.haxul.headhunter.models.responses.VacancyItem;
-import com.haxul.headhunter.models.responses.VacancyViewPageHeadHunter;
+import com.haxul.headhunter.models.responses.VacancyHeadHunter;
+import com.haxul.headhunter.models.responses.VacancyDetailedPageHeadHunter;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class HeadHunterService {
          */
         Double usdToRubRate = exchangeCurrencyService.getUsdToRubRate();
 
-        List<VacancyItem> vacanciesWithoutExperienceList = vacanciesFuture.get(10, TimeUnit.SECONDS);
+        List<VacancyHeadHunter> vacanciesWithoutExperienceList = vacanciesFuture.get(10, TimeUnit.SECONDS);
 
         /*
             fetch experience info for each vacancy. Then transform data list to map (vacancyId -> experience)
@@ -53,7 +53,7 @@ public class HeadHunterService {
                 .getListOfDetailedVacancies(vacanciesWithoutExperienceList)
                 .get()
                 .stream()
-                .collect(Collectors.toMap(VacancyViewPageHeadHunter::getId, VacancyViewPageHeadHunter::getExperience));
+                .collect(Collectors.toMap(VacancyDetailedPageHeadHunter::getId, VacancyDetailedPageHeadHunter::getExperience));
 
         /*
             merge experience data with vacancy data
@@ -65,9 +65,9 @@ public class HeadHunterService {
         /*
             group vacancies by their experience
          */
-        Map<ExperienceHeadhunter, List<VacancyItem>> vacanciesGroupedByExperience = vacanciesWithExperienceList
+        Map<ExperienceHeadhunter, List<VacancyHeadHunter>> vacanciesGroupedByExperience = vacanciesWithExperienceList
                 .stream()
-                .collect(Collectors.groupingBy(VacancyItem::getExperience));
+                .collect(Collectors.groupingBy(VacancyHeadHunter::getExperience));
 
         var demands = new LinkedList<MarketDemand>();
 
@@ -94,7 +94,7 @@ public class HeadHunterService {
      * @param usdToRubRate USD to RUB rate
      * @return average gross rub salary of this vacancy list
      */
-    private int computeAverageRubledGrossSalaryForVacancyList(List<VacancyItem> vacancies, double usdToRubRate) {
+    private int computeAverageRubledGrossSalaryForVacancyList(List<VacancyHeadHunter> vacancies, double usdToRubRate) {
         int allGrossSalary = 0;
         for (var vacancy : vacancies) {
             allGrossSalary += getRubledGrossAverageSalaryForVacancy(vacancy, usdToRubRate);
@@ -127,7 +127,7 @@ public class HeadHunterService {
      * @return gross RUB salary
      */
 
-    public int getRubledGrossAverageSalaryForVacancy(final VacancyItem vacancy, final Double usdToRub) {
+    public int getRubledGrossAverageSalaryForVacancy(final VacancyHeadHunter vacancy, final Double usdToRub) {
         var salary = vacancy.getSalary();
         int average = getAverageTitledSalary(salary);
 

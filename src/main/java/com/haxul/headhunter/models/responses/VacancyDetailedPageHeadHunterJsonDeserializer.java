@@ -9,20 +9,20 @@ import java.io.IOException;
 
 import static com.haxul.headhunter.models.experience.ExperienceHeadhunter.*;
 
-public class VacancyViewPageHeadHunterJsonDeserializer extends StdDeserializer<VacancyViewPageHeadHunter> {
+public class VacancyDetailedPageHeadHunterJsonDeserializer extends StdDeserializer<VacancyDetailedPageHeadHunter> {
 
-    public VacancyViewPageHeadHunterJsonDeserializer() {
+    public VacancyDetailedPageHeadHunterJsonDeserializer() {
         this(null);
     }
-    protected VacancyViewPageHeadHunterJsonDeserializer(Class<?> vc) {
+    protected VacancyDetailedPageHeadHunterJsonDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public VacancyViewPageHeadHunter deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public VacancyDetailedPageHeadHunter deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         JsonNode node = p.getCodec().readTree(p);
 
-        VacancyViewPageHeadHunter vacancyViewPageResponse = new VacancyViewPageHeadHunter();
+        VacancyDetailedPageHeadHunter vacancyViewPageResponse = new VacancyDetailedPageHeadHunter();
         vacancyViewPageResponse.setId(Integer.parseInt(node.get("id").asText()));
         String s = node.get("experience").get("id").asText();
 

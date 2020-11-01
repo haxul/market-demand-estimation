@@ -5,8 +5,8 @@ import com.haxul.headhunter.models.experience.ExperienceHeadhunter;
 import lombok.Data;
 
 @Data
-@JsonDeserialize(using = VacancyViewPageHeadHunterJsonDeserializer.class)
-public class VacancyViewPageHeadHunter {
+@JsonDeserialize(using = VacancyDetailedPageHeadHunterJsonDeserializer.class)
+public class VacancyDetailedPageHeadHunter {
      private Integer id;
      private ExperienceHeadhunter experience;
 }

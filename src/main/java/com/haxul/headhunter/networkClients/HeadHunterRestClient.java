@@ -2,8 +2,8 @@ package com.haxul.headhunter.networkClients;
 
 import com.haxul.headhunter.exceptions.HeadHunterWrongResponseException;
 import com.haxul.headhunter.models.responses.VacanciesHeadHunter;
-import com.haxul.headhunter.models.responses.VacancyItem;
-import com.haxul.headhunter.models.responses.VacancyViewPageHeadHunter;
+import com.haxul.headhunter.models.responses.VacancyHeadHunter;
+import com.haxul.headhunter.models.responses.VacancyDetailedPageHeadHunter;
 import com.haxul.utils.AppUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +34,11 @@ public class HeadHunterRestClient {
     }
 
 
-    public CompletableFuture<List<VacancyItem>> findVacanciesAsync(String position, int areaId, int page, List<VacancyItem> vacancies) {
+    public CompletableFuture<List<VacancyHeadHunter>> findVacanciesAsync(String position, int areaId, int page, List<VacancyHeadHunter> vacancies) {
         return CompletableFuture.supplyAsync(() -> findVacancies(position, areaId, page, vacancies));
     }
 
-    public List<VacancyItem> findVacancies(String position, int areaId, int page, List<VacancyItem> vacancies) {
+    public List<VacancyHeadHunter> findVacancies(String position, int areaId, int page, List<VacancyHeadHunter> vacancies) {
         try {
             final String url = baseUrl + "vacancies?text=\"" + position + "\"&area=" + areaId + "&page=" + page + "&only_with_salary=true";
             VacanciesHeadHunter response = restTemplate.getForObject(url, VacanciesHeadHunter.class);
@@ -52,16 +52,16 @@ public class HeadHunterRestClient {
         }
     }
 
-    private CompletableFuture<VacancyViewPageHeadHunter> getDetailedVacancyDataById(int id) {
+    private CompletableFuture<VacancyDetailedPageHeadHunter> getDetailedVacancyDataById(int id) {
         final String url = baseUrl + "vacancies/" + id;
         return CompletableFuture
-                .supplyAsync(() -> restTemplate.getForObject(url, VacancyViewPageHeadHunter.class))
+                .supplyAsync(() -> restTemplate.getForObject(url, VacancyDetailedPageHeadHunter.class))
                 .exceptionally(appUtils::handleError);
     }
 
 
-    public CompletableFuture<List<VacancyViewPageHeadHunter>> getListOfDetailedVacancies(List<VacancyItem> vacanciesWithoutExperience) {
-        List<CompletableFuture<VacancyViewPageHeadHunter>> detailedVacancies = vacanciesWithoutExperience
+    public CompletableFuture<List<VacancyDetailedPageHeadHunter>> getListOfDetailedVacancies(List<VacancyHeadHunter> vacanciesWithoutExperience) {
+        List<CompletableFuture<VacancyDetailedPageHeadHunter>> detailedVacancies = vacanciesWithoutExperience
                 .stream()
                 .map(vacancyWithoutExperience -> getDetailedVacancyDataById(vacancyWithoutExperience.getId()))
                 .collect(Collectors.toList());

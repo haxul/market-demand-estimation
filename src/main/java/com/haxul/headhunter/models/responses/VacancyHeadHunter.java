@@ -5,7 +5,7 @@ import com.haxul.headhunter.models.experience.ExperienceHeadhunter;
 import lombok.Data;
 
 @Data
-public class VacancyItem {
+public class VacancyHeadHunter {
 
      private SalaryHeadHunter salary;
 

@@ -9,5 +9,5 @@ public class VacanciesHeadHunter {
     private Integer found;
     private Integer pages;
     private Integer page;
-    private List<VacancyItem> items;
+    private List<VacancyHeadHunter> items;
 }

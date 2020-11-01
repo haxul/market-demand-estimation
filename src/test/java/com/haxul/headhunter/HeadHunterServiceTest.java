@@ -1,10 +1,11 @@
 package com.haxul.headhunter;
 
 
+import com.haxul.headhunter.entities.MarketDemand;
 import com.haxul.headhunter.models.area.City;
 import com.haxul.headhunter.models.currency.Currency;
 import com.haxul.headhunter.models.responses.SalaryHeadHunter;
-import com.haxul.headhunter.models.responses.VacancyItem;
+import com.haxul.headhunter.models.responses.VacancyHeadHunter;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
 import com.haxul.headhunter.services.HeadHunterService;
 import com.haxul.utils.AppUtils;
@@ -56,14 +57,14 @@ public class HeadHunterServiceTest {
     public void computeMarketDemandStateNetworkTest() throws InterruptedException, ExecutionException, TimeoutException {
         var restClient = new HeadHunterRestClient(new RestTemplate(), new AppUtils());
         restClient.setBaseUrl(baseUrl);
-        List<VacancyItem> list = restClient.findVacanciesAsync("java", City.SAMARA.getId(), 0, new LinkedList<>()).get(5, TimeUnit.SECONDS);
+        List<VacancyHeadHunter> list = restClient.findVacanciesAsync("java", City.SAMARA.getId(), 0, new LinkedList<>()).get(5, TimeUnit.SECONDS);
         assertNotEquals(0, list.size());
     }
 
     // TODO fix test
     @Test
     public void computeMarkDemandStateTest() throws InterruptedException, ExecutionException, TimeoutException {
-        VacancyItem vacancyItemResponse = new VacancyItem();
+        VacancyHeadHunter vacancyItemResponse = new VacancyHeadHunter();
         SalaryHeadHunter salaryVacancyResponse = new SalaryHeadHunter();
         vacancyItemResponse.setSalary(salaryVacancyResponse);
         salaryVacancyResponse.setCurrency(Currency.RUR);
@@ -71,17 +72,17 @@ public class HeadHunterServiceTest {
         salaryVacancyResponse.setTo(80000);
         salaryVacancyResponse.setGross(true);
 
-        List<VacancyItem> list = new LinkedList<>();
+        List<VacancyHeadHunter> list = new LinkedList<>();
         list.add(vacancyItemResponse);
         var future = CompletableFuture.completedFuture(list);
 //        when(headHunterRestClient.findVacanciesAsync(anyString(), anyInt(), anyInt(), anyList())).thenReturn(future);
 //        when(exchangeCurrencyService.getUsdToRubRate()).thenReturn(80.0);
-        headHunterService.computeMarketDemandState("java", City.SAMARA);
+        List<MarketDemand> java = headHunterService.computeMarketDemandState("java", City.SAMARA);
     }
 
     @Test
     public void getRubleAverageSalaryTest() {
-        VacancyItem vacancyItemResponse = new VacancyItem();
+        VacancyHeadHunter vacancyItemResponse = new VacancyHeadHunter();
         SalaryHeadHunter salaryVacancyResponse = new SalaryHeadHunter();
         vacancyItemResponse.setSalary(salaryVacancyResponse);
 
