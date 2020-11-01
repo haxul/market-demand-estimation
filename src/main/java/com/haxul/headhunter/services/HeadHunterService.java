@@ -81,9 +81,9 @@ public class HeadHunterService {
             demand.setAmount(item.getValue().size());
             demand.setCity(city);
             demand.setMinExperience(item.getKey().getMinYears());
-            demand.setAverageGrossSalary(computeAverageGrossSalary(item.getValue(), usdToRubRate));
+            int averageRubGrossSalary = computeAverageRubledGrossSalaryForVacancyList(item.getValue(), usdToRubRate);
+            demand.setAverageGrossSalary(averageRubGrossSalary);
             demands.add(demand);
-
         }
 
         return demands;
@@ -94,10 +94,10 @@ public class HeadHunterService {
      * @param usdToRubRate USD to RUB rate
      * @return average gross rub salary of this vacancy list
      */
-    private int computeAverageGrossSalary(List<VacancyItem> vacancies, double usdToRubRate) {
+    private int computeAverageRubledGrossSalaryForVacancyList(List<VacancyItem> vacancies, double usdToRubRate) {
         int allGrossSalary = 0;
         for (var vacancy : vacancies) {
-            allGrossSalary += getRubledGrossAverageSalary(vacancy, usdToRubRate);
+            allGrossSalary += getRubledGrossAverageSalaryForVacancy(vacancy, usdToRubRate);
         }
         return allGrossSalary / vacancies.size();
     }
@@ -122,12 +122,12 @@ public class HeadHunterService {
 
 
     /**
-     * @param vacancy - containing info about salary ether USD or RUB
+     * @param vacancy - containing info about one salary ether USD or RUB
      * @param usdToRub - rate USD to RUB
      * @return gross RUB salary
      */
 
-    public int getRubledGrossAverageSalary(final VacancyItem vacancy, final Double usdToRub) {
+    public int getRubledGrossAverageSalaryForVacancy(final VacancyItem vacancy, final Double usdToRub) {
         var salary = vacancy.getSalary();
         int average = getAverageTitledSalary(salary);
 

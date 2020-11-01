@@ -89,37 +89,37 @@ public class HeadHunterServiceTest {
         salaryVacancyResponse.setFrom(70000);
         salaryVacancyResponse.setTo(80000);
         salaryVacancyResponse.setGross(true);
-        assertEquals(75000, headHunterService.getRubledGrossAverageSalary(vacancyItemResponse, 80.0));
+        assertEquals(75000, headHunterService.getRubledGrossAverageSalaryForVacancy(vacancyItemResponse, 80.0));
 
         salaryVacancyResponse.setCurrency(Currency.RUR);
         salaryVacancyResponse.setGross(true);
         salaryVacancyResponse.setFrom(70000);
         salaryVacancyResponse.setTo(0);
-        assertEquals(70000, headHunterService.getRubledGrossAverageSalary(vacancyItemResponse, 80.0));
+        assertEquals(70000, headHunterService.getRubledGrossAverageSalaryForVacancy(vacancyItemResponse, 80.0));
 
         salaryVacancyResponse.setFrom(82300);
         salaryVacancyResponse.setTo(83000);
         salaryVacancyResponse.setGross(false);
         salaryVacancyResponse.setCurrency(Currency.RUR);
-        assertEquals(95000, headHunterService.getRubledGrossAverageSalary(vacancyItemResponse, 80.0));
+        assertEquals(95000, headHunterService.getRubledGrossAverageSalaryForVacancy(vacancyItemResponse, 80.0));
 
         salaryVacancyResponse.setCurrency(Currency.USD);
         salaryVacancyResponse.setGross(true);
         salaryVacancyResponse.setFrom(1100);
         salaryVacancyResponse.setTo(900);
-        assertEquals(80000, headHunterService.getRubledGrossAverageSalary(vacancyItemResponse, 80.0));
+        assertEquals(80000, headHunterService.getRubledGrossAverageSalaryForVacancy(vacancyItemResponse, 80.0));
 
         salaryVacancyResponse.setCurrency(Currency.USD);
         salaryVacancyResponse.setGross(false);
         salaryVacancyResponse.setFrom(1100);
         salaryVacancyResponse.setTo(900);
-        assertEquals(91954, headHunterService.getRubledGrossAverageSalary(vacancyItemResponse, 80.0));
+        assertEquals(91954, headHunterService.getRubledGrossAverageSalaryForVacancy(vacancyItemResponse, 80.0));
 
         salaryVacancyResponse.setCurrency(Currency.USD);
         salaryVacancyResponse.setGross(false);
         salaryVacancyResponse.setFrom(1000);
         salaryVacancyResponse.setTo(0);
-        assertEquals(91954, headHunterService.getRubledGrossAverageSalary(vacancyItemResponse, 80.0));
+        assertEquals(91954, headHunterService.getRubledGrossAverageSalaryForVacancy(vacancyItemResponse, 80.0));
     }
 
 }
