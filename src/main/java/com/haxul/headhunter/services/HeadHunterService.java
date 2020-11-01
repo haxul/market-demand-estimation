@@ -40,7 +40,7 @@ public class HeadHunterService {
          */
         var vacanciesFuture = headHunterRestClient.findVacanciesAsync(position, city.getId(), 0, new LinkedList<>());
         /*
-         *  fetch info about concurrency rate. It is more interesting rate  USD to RUB
+         *  fetch info about  USD to RUB rate
          */
         Double usdToRubRate = exchangeCurrencyService.getUsdToRubRate();
 
