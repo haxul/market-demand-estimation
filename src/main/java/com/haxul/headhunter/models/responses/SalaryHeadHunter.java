@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SalaryVacancyResponse {
+public class SalaryHeadHunter {
     private int from;
     private int to;
     private Currency currency;

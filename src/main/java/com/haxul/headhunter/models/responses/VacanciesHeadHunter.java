@@ -5,9 +5,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class VacanciesResponse {
+public class VacanciesHeadHunter {
     private Integer found;
     private Integer pages;
     private Integer page;
-    private List<VacancyItemResponse> items;
+    private List<VacancyItem> items;
 }

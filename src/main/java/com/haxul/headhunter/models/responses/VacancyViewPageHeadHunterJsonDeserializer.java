@@ -7,22 +7,22 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
 
-import static com.haxul.headhunter.models.experience.Experience.*;
+import static com.haxul.headhunter.models.experience.ExperienceHeadhunter.*;
 
-public class VacancyViewPageResponseJsonDeserializer extends StdDeserializer<VacancyViewPageResponse> {
+public class VacancyViewPageHeadHunterJsonDeserializer extends StdDeserializer<VacancyViewPageHeadHunter> {
 
-    public VacancyViewPageResponseJsonDeserializer() {
+    public VacancyViewPageHeadHunterJsonDeserializer() {
         this(null);
     }
-    protected VacancyViewPageResponseJsonDeserializer(Class<?> vc) {
+    protected VacancyViewPageHeadHunterJsonDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public VacancyViewPageResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public VacancyViewPageHeadHunter deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         JsonNode node = p.getCodec().readTree(p);
 
-        VacancyViewPageResponse vacancyViewPageResponse = new VacancyViewPageResponse();
+        VacancyViewPageHeadHunter vacancyViewPageResponse = new VacancyViewPageHeadHunter();
         vacancyViewPageResponse.setId(Integer.parseInt(node.get("id").asText()));
         String s = node.get("experience").get("id").asText();
 
