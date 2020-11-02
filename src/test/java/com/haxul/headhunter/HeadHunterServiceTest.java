@@ -161,7 +161,7 @@ public class HeadHunterServiceTest {
         CompletableFuture<List<VacancyDetailedPageHeadHunter>> responseListFuture = CompletableFuture.completedFuture(responseList);
         when(headHunterRestClient.getListOfDetailedVacancies(anyList())).thenReturn(responseListFuture);
 
-        List<MarketDemand> result = headHunterService.computeMarketDemandState("java", City.SAMARA);
+        List<MarketDemand> result = headHunterService.findMarketDemandsForToday("java", City.SAMARA);
         result.sort((a, b) -> Integer.compare(b.getMinExperience(), a.getMinExperience()));
         assertEquals(2, result.size());
         assertEquals(80000, result.get(0).getAverageGrossSalary());

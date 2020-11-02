@@ -34,7 +34,13 @@ public class HeadHunterService {
         this.exchangeCurrencyService = exchangeCurrencyService;
     }
 
-    public List<MarketDemand> computeMarketDemandState(String position, City city) throws InterruptedException, ExecutionException, TimeoutException {
+    /**
+     * @param position - name of vacancy looked vor in HeadHunter
+     * @param city - city name where vacancy is placed
+     * @return list of market demands grouped by experience valued in years. Values are relevant for now
+     */
+
+    public List<MarketDemand> findMarketDemandsForToday(String position, City city) throws InterruptedException, ExecutionException, TimeoutException {
         /*
          * get future containing general data about vacancies. There are no info about required experience in this request
          */
