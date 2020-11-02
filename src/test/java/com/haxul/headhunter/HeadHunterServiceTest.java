@@ -61,7 +61,7 @@ public class HeadHunterServiceTest {
 
 
     @Test
-    public void computeMarketDemandStateNetworkTest() throws InterruptedException, ExecutionException, TimeoutException {
+    public void findMarketDemandsForTodayNetworkTest() throws InterruptedException, ExecutionException, TimeoutException {
         var restClient = new HeadHunterRestClient(new RestTemplate(), new AppUtils());
         restClient.setBaseUrl(baseUrl);
         List<VacancyHeadHunter> list = restClient.findVacanciesAsync("java", City.SAMARA.getId(), 0, new LinkedList<>()).get(5, TimeUnit.SECONDS);
@@ -69,7 +69,7 @@ public class HeadHunterServiceTest {
     }
 
     @Test
-    public void computeMarkDemandStateTest() throws InterruptedException, ExecutionException, TimeoutException {
+    public void findMarketDemandsForTodayTest() throws InterruptedException, ExecutionException, TimeoutException {
         var vacancies = List.of(0, 1, 2, 3, 4, 5).stream().map(i -> {
             var vacancy = new VacancyHeadHunter();
             vacancy.setId(i);
@@ -169,7 +169,7 @@ public class HeadHunterServiceTest {
     }
 
     @Test
-    public void getRubleAverageSalaryTest() {
+    public void getRubledGrossAverageSalaryForVacancyTest() {
         VacancyHeadHunter vacancyItemResponse = new VacancyHeadHunter();
         SalaryHeadHunter salaryVacancyResponse = new SalaryHeadHunter();
         vacancyItemResponse.setSalary(salaryVacancyResponse);

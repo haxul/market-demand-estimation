@@ -36,7 +36,7 @@ public class HeadHunterService {
 
     /**
      * @param position - name of vacancy looked vor in HeadHunter
-     * @param city - city name where vacancy is placed
+     * @param city     - city name where vacancy is placed
      * @return list of market demands grouped by experience valued in years. Values are relevant for now
      */
 
@@ -96,7 +96,7 @@ public class HeadHunterService {
     }
 
     /**
-     * @param vacancies  list of vacancies
+     * @param vacancies    list of vacancies
      * @param usdToRubRate USD to RUB rate
      * @return average gross rub salary of this vacancy list
      */
@@ -113,8 +113,8 @@ public class HeadHunterService {
     }
 
     /**
-       @param salary - contain info about max and min money getting in vacancy description.
-       @return  depending on their existing , compute the average salary.
+     * @param salary - contain info about max and min money getting in vacancy description.
+     * @return depending on their existing , compute the average salary.
      */
     private int getAverageTitledSalary(final SalaryHeadHunter salary) {
         boolean doesSalaryHasFrom = salary.getFrom() != 0;
@@ -126,9 +126,8 @@ public class HeadHunterService {
     }
 
 
-
     /**
-     * @param vacancy - containing info about one salary ether USD or RUB
+     * @param vacancy  - containing info about one salary ether USD or RUB
      * @param usdToRub - rate USD to RUB
      * @return gross RUB salary
      */
@@ -137,19 +136,16 @@ public class HeadHunterService {
         var salary = vacancy.getSalary();
         int average = getAverageTitledSalary(salary);
 
-        if (Currency.RUR == salary.getCurrency()) {
-            return vacancy.getSalary().isGross()
-                    ? average
-                    : addTaxesForSalary(average, Integer.parseInt(taxRatePercentage));
-        }
-
-        if (Currency.USD == salary.getCurrency()) {
+        if (Currency.RUR == salary.getCurrency()) return addTaxesIfItIsNotGross(salary.isGross(), average);
+        else if (Currency.USD == salary.getCurrency()) {
             int averageRuble = (int) (average * usdToRub);
-            return salary.isGross()
-                    ? averageRuble
-                    : addTaxesForSalary(averageRuble, Integer.parseInt(taxRatePercentage));
+            return addTaxesIfItIsNotGross(salary.isGross(), averageRuble);
         }
 
         throw new HeadHunterUnknownCurrencyException(vacancy.getSalary().getCurrency().toString());
+    }
+
+    private int addTaxesIfItIsNotGross(boolean isGross, int salary) {
+        return isGross ? salary : addTaxesForSalary(salary, Integer.parseInt(taxRatePercentage));
     }
 }
