@@ -8,13 +8,16 @@ import com.haxul.headhunter.models.area.City;
 import com.haxul.headhunter.models.currency.Currency;
 import com.haxul.headhunter.models.experience.ExperienceHeadhunter;
 import com.haxul.headhunter.models.responses.SalaryHeadHunter;
-import com.haxul.headhunter.models.responses.VacancyHeadHunter;
 import com.haxul.headhunter.models.responses.VacancyDetailedPageHeadHunter;
+import com.haxul.headhunter.models.responses.VacancyHeadHunter;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -50,7 +53,7 @@ public class HeadHunterService {
          */
         Double usdToRubRate = exchangeCurrencyService.getUsdToRubRate();
 
-        List<VacancyHeadHunter> vacanciesWithoutExperienceList = vacanciesFuture.get(10, TimeUnit.SECONDS);
+        List<VacancyHeadHunter> vacanciesWithoutExperienceList = vacanciesFuture.get(20, TimeUnit.SECONDS);
 
         /*
             fetch experience info for each vacancy. Then transform data list to map (vacancyId -> experience)
@@ -86,12 +89,12 @@ public class HeadHunterService {
             demand.setAtMoment(new Date());
             demand.setAmount(item.getValue().size());
             demand.setCity(city);
-            demand.setMinExperience(item.getKey().getMinYears());
+            demand.setMinYearExperience(item.getKey().getMinYears());
             int averageRubGrossSalary = computeAverageRubledGrossSalaryForVacancyList(item.getValue(), usdToRubRate);
-            demand.setAverageGrossSalary(averageRubGrossSalary);
+            demand.setAverageRubGrossSalary(averageRubGrossSalary);
             demands.add(demand);
         }
-
+        demands.sort((a, b) -> Integer.compare(b.getMinYearExperience(), a.getMinYearExperience()));
         return demands;
     }
 
