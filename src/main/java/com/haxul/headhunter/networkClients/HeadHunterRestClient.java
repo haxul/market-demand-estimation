@@ -1,9 +1,9 @@
 package com.haxul.headhunter.networkClients;
 
 import com.haxul.headhunter.exceptions.HeadHunterWrongResponseException;
-import com.haxul.headhunter.models.responses.VacanciesHeadHunter;
-import com.haxul.headhunter.models.responses.VacancyHeadHunter;
-import com.haxul.headhunter.models.responses.VacancyDetailedPageHeadHunter;
+import com.haxul.headhunter.models.hhApiResponses.VacanciesHeadHunter;
+import com.haxul.headhunter.models.hhApiResponses.VacancyHeadHunter;
+import com.haxul.headhunter.models.hhApiResponses.VacancyDetailedPageHeadHunter;
 import com.haxul.utils.AppUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

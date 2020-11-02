@@ -13,4 +13,5 @@ public class MarketDemand {
     private Date atMoment;
     private City city;
     private int minYearExperience;
+    private String source;
 }

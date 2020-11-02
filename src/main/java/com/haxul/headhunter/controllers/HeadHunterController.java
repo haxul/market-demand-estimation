@@ -2,6 +2,7 @@ package com.haxul.headhunter.controllers;
 
 
 import com.haxul.headhunter.entities.MarketDemand;
+import com.haxul.headhunter.models.DemandResponse;
 import com.haxul.headhunter.models.area.City;
 import com.haxul.headhunter.services.HeadHunterService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,15 @@ public class HeadHunterController {
     }
 
     @GetMapping
-    public List<MarketDemand> getMarketDemandsByPositionAndCity(@RequestParam String position, @RequestParam City city) throws InterruptedException, ExecutionException, TimeoutException {
-        return headHunterService.findMarketDemandsForToday(position, city);
+    public DemandResponse getMarketDemandsByPositionAndCity(@RequestParam String position, @RequestParam City city) throws InterruptedException, ExecutionException, TimeoutException {
+        List<MarketDemand> demands = headHunterService.findMarketDemandsForToday(position, city, "Head Hunter");
+        var demandResponse = new DemandResponse();
+        demandResponse.setItems(demands);
+        int found = 0;
+        for (var demand : demands) {
+            found += demand.getAmount();
+        }
+        demandResponse.setFoundVacancies(found);
+        return demandResponse;
     }
 }

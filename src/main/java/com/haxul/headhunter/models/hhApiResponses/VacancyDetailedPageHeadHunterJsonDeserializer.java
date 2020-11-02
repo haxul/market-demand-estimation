@@ -1,4 +1,4 @@
-package com.haxul.headhunter.models.responses;
+package com.haxul.headhunter.models.hhApiResponses;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

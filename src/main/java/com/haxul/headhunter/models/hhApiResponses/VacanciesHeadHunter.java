@@ -1,4 +1,4 @@
-package com.haxul.headhunter.models.responses;
+package com.haxul.headhunter.models.hhApiResponses;
 
 import lombok.Data;
 

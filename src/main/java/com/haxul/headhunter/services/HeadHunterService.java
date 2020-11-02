@@ -7,9 +7,9 @@ import com.haxul.headhunter.exceptions.HeadHunterUnknownCurrencyException;
 import com.haxul.headhunter.models.area.City;
 import com.haxul.headhunter.models.currency.Currency;
 import com.haxul.headhunter.models.experience.ExperienceHeadhunter;
-import com.haxul.headhunter.models.responses.SalaryHeadHunter;
-import com.haxul.headhunter.models.responses.VacancyDetailedPageHeadHunter;
-import com.haxul.headhunter.models.responses.VacancyHeadHunter;
+import com.haxul.headhunter.models.hhApiResponses.SalaryHeadHunter;
+import com.haxul.headhunter.models.hhApiResponses.VacancyDetailedPageHeadHunter;
+import com.haxul.headhunter.models.hhApiResponses.VacancyHeadHunter;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
@@ -43,7 +42,7 @@ public class HeadHunterService {
      * @return list of market demands grouped by experience valued in years. Values are relevant for now
      */
 
-    public List<MarketDemand> findMarketDemandsForToday(String position, City city) throws InterruptedException, ExecutionException, TimeoutException {
+    public List<MarketDemand> findMarketDemandsForToday(String position, City city, String source) throws InterruptedException, ExecutionException, TimeoutException {
         /*
          * get future containing general data about vacancies. There are no info about required experience in this request
          */
@@ -53,7 +52,16 @@ public class HeadHunterService {
          */
         Double usdToRubRate = exchangeCurrencyService.getUsdToRubRate();
 
-        List<VacancyHeadHunter> vacanciesWithoutExperienceList = vacanciesFuture.get(20, TimeUnit.SECONDS);
+        /*
+            complete vacancies future and filter vacancies which have salary equaled null
+         */
+
+        List<VacancyHeadHunter> vacanciesWithoutExperienceList = vacanciesFuture
+                .get()
+                .stream()
+                .filter( vacancy -> vacancy.getSalary() != null)
+                .collect(Collectors.toList());
+
 
         /*
             fetch experience info for each vacancy. Then transform data list to map (vacancyId -> experience)
@@ -83,15 +91,20 @@ public class HeadHunterService {
         /*
             create market demand according to vacancies data
          */
-        for (var item : vacanciesGroupedByExperience.entrySet()) {
+        for (var experienceVacancyListEntry : vacanciesGroupedByExperience.entrySet()) {
             var demand = new MarketDemand();
             demand.setPosition(position);
             demand.setAtMoment(new Date());
-            demand.setAmount(item.getValue().size());
+            demand.setAmount(experienceVacancyListEntry.getValue().size());
             demand.setCity(city);
-            demand.setMinYearExperience(item.getKey().getMinYears());
-            int averageRubGrossSalary = computeAverageRubledGrossSalaryForVacancyList(item.getValue(), usdToRubRate);
+            demand.setMinYearExperience(experienceVacancyListEntry.getKey().getMinYears());
+            var vacanciesWithDefinedCurrencyType = experienceVacancyListEntry.getValue()
+                    .stream()
+                    .filter(vacancy -> vacancy.getSalary().getCurrency() != null)
+                    .collect(Collectors.toList());
+            int averageRubGrossSalary = computeAverageRubledGrossSalaryForVacancyList(vacanciesWithDefinedCurrencyType, usdToRubRate);
             demand.setAverageRubGrossSalary(averageRubGrossSalary);
+            demand.setSource(source);
             demands.add(demand);
         }
         demands.sort((a, b) -> Integer.compare(b.getMinYearExperience(), a.getMinYearExperience()));
