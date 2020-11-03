@@ -1,5 +1,6 @@
 package com.haxul.headhunter.services;
 
+import com.haxul.exchangeCurrency.entities.CurrencyRate;
 import com.haxul.exchangeCurrency.services.ExchangeCurrencyService;
 import com.haxul.headhunter.entities.MarketDemand;
 import com.haxul.headhunter.exceptions.HeadHunterSalaryIsZeroException;
@@ -11,28 +12,30 @@ import com.haxul.headhunter.models.hhApiResponses.SalaryHeadHunter;
 import com.haxul.headhunter.models.hhApiResponses.VacancyDetailedPageHeadHunter;
 import com.haxul.headhunter.models.hhApiResponses.VacancyHeadHunter;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
+import com.haxul.headhunter.repositories.HeadHunterRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import static com.haxul.exchangeCurrency.models.CurrenciesExchanges.RUB_IN_USD;
+
 @Service
+@RequiredArgsConstructor
 public class HeadHunterService {
 
     private final HeadHunterRestClient headHunterRestClient;
     private final ExchangeCurrencyService exchangeCurrencyService;
+    private final HeadHunterRepository headHunterRepository;
 
     @Value("${headhunter.taxRatePercentage}")
     private String taxRatePercentage;
-
-    public HeadHunterService(HeadHunterRestClient headHunterRestClient, ExchangeCurrencyService exchangeCurrencyService) {
-        this.headHunterRestClient = headHunterRestClient;
-        this.exchangeCurrencyService = exchangeCurrencyService;
-    }
 
     /**
      * @param position - name of vacancy looked vor in HeadHunter
@@ -40,15 +43,46 @@ public class HeadHunterService {
      * @return list of market demands grouped by experience valued in years. Values are relevant for now
      */
 
+    // TODO write test
+    @Transactional
     public List<MarketDemand> findMarketDemandsForToday(String position, City city, String source) throws InterruptedException, ExecutionException, TimeoutException {
+
+        /*
+            check if data we need exists in postgres and if it does, return it
+         */
+
+        List<MarketDemand> existedMarketDemandsList = headHunterRepository.findByPositionAndCityAndAtMoment(position, city, new Date());
+
+        if (!existedMarketDemandsList.isEmpty()) {
+
+            existedMarketDemandsList.sort((a, b) -> Integer.compare(b.getMinYearExperience(), a.getMinYearExperience()));
+            return existedMarketDemandsList;
+        }
+
         /*
          * get future containing general data about vacancies. There are no info about required experience in this request
          */
+
         var vacanciesFuture = headHunterRestClient.findVacanciesAsync(position, city.getId(), 0, new LinkedList<>());
+
+
         /*
-         *  fetch info about  USD to RUB rate
+            check if postgres have relevant USD to RUB rate.
+
+            if it does not,  fetch info about  USD to RUB rate from the internet and save it into postgres
          */
-        Double usdToRubRate = exchangeCurrencyService.getUsdToRubRate();
+
+        // TODO refactor this block after test are written
+
+        CurrencyRate existedRate = exchangeCurrencyService.findCurrencyRateByExchangedCurrenciesAndDate(RUB_IN_USD, new Date());
+        Float usdToRubRate = 0.0f;
+
+        if (existedRate == null) {
+            usdToRubRate = exchangeCurrencyService.getUsdToRubRate();
+            CurrencyRate oldRate = exchangeCurrencyService.findByExchangedCurrencies(RUB_IN_USD);
+            if (oldRate == null) exchangeCurrencyService.createCurrencyRate(usdToRubRate, RUB_IN_USD);
+            else exchangeCurrencyService.updateCurrencyRate(oldRate, usdToRubRate);
+        } else usdToRubRate = existedRate.getRate();
 
         /*
             complete vacancies future and filter vacancies which have salary equaled null
@@ -66,14 +100,14 @@ public class HeadHunterService {
          */
 
 
-        var notUniqueDetailedVacancyList  = headHunterRestClient
+        var notUniqueDetailedVacancyList = headHunterRestClient
                 .getListOfDetailedVacancies(vacanciesWithoutExperienceList)
                 .get(60, TimeUnit.SECONDS);
 
         /*
             make list be unique. We are doing because  sometimes Headhunter Api returns vacancies with the same id
          */
-            
+
         Set<VacancyDetailedPageHeadHunter> uniqueDetailedVacancies = new HashSet<>(notUniqueDetailedVacancyList);
 
         /*
@@ -110,6 +144,7 @@ public class HeadHunterService {
         /*
             create market demand according to vacancies data
          */
+
         for (var experienceVacancyListEntry : vacanciesGroupedByExperience.entrySet()) {
             var demand = new MarketDemand();
             demand.setPosition(position);
@@ -125,6 +160,10 @@ public class HeadHunterService {
             demand.setAverageRubGrossSalary(averageRubGrossSalary);
             demand.setSource(source);
             demands.add(demand);
+            /*
+                save demand in postgres
+             */
+            headHunterRepository.save(demand);
         }
         demands.sort((a, b) -> Integer.compare(b.getMinYearExperience(), a.getMinYearExperience()));
         return demands;

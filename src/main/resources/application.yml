@@ -7,3 +7,17 @@ headhunter:
 currency:
   api:
     url: https://api.exchangeratesapi.io/latest
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/estimation-db
+    username: haxul
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    change-log: classpath:db/db.changelog-master.xml

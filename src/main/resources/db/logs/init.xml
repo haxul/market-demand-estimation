@@ -1,0 +1,46 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="init" author="haxul">
+        <createTable tableName="market_demands">
+            <column name="id" autoIncrement="true" type="bigserial">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+           
+            <column name="position" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="average_rub_gross_salary" type="int">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="amount" type="int">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="at_moment" type="date">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="city" type="varchar(100)" >
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="min_year_experience" type="int">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="source" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+
+</databaseChangeLog>

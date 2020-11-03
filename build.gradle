@@ -27,6 +27,9 @@ dependencies {
     }
     testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.13'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.3.4.RELEASE'
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '4.1.1'
 
 }
 

@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 public class RatesResponse {
     @JsonProperty("RUB")
-    private Double rub;
+    private Float rub;
 
     @JsonProperty("USD")
-    private Double usd;
+    private Float usd;
 }
