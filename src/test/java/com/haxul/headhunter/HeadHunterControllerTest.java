@@ -43,7 +43,7 @@ public class HeadHunterControllerTest {
     private HeadHunterService headHunterService;
 
 
-    private List<MarketDemand> list = new LinkedList<>();
+    private final List<MarketDemand> list = new LinkedList<>();
 
     @BeforeEach
     public void invoke() {
@@ -84,7 +84,7 @@ public class HeadHunterControllerTest {
     @Test
     public void getMarketDemandsByPositionAndCityTest() throws Exception {
 
-        when(headHunterService.findMarketDemandsForToday(anyString(),any(), anyString())).thenReturn(list);
+        when(headHunterService.findMarketDemandsForToday(anyString(), any(), anyString())).thenReturn(list);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/headhunter/demands?position=java&city=samara")
                 .accept(MediaType.APPLICATION_JSON)

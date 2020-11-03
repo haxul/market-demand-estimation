@@ -1,4 +1,4 @@
-package com.haxul.exceptions;
+package com.haxul.exceptionController;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

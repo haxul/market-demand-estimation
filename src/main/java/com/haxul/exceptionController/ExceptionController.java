@@ -1,4 +1,4 @@
-package com.haxul.exceptions;
+package com.haxul.exceptionController;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.TypeMismatchException;
@@ -39,9 +39,15 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(message);
     }
 
-    @ExceptionHandler(value = {TimeoutException.class, InterruptedException.class, ExecutionException.class})
-    public ResponseEntity<Object> handleUsernameExistException(Exception ex, WebRequest request) {
+    @ExceptionHandler(value = {InterruptedException.class, ExecutionException.class})
+    public ResponseEntity<Object> handleInterruptAndExecutionException(Exception ex, WebRequest request) {
         ErrorMessage message = new ErrorMessage("Error", "Concurrency problem",  ex.getMessage(), new Date());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body(message);
+    }
+
+    @ExceptionHandler(value = {TimeoutException.class})
+    public ResponseEntity<Object> handleTimeoutException(Exception ex, WebRequest request) {
+        ErrorMessage message = new ErrorMessage("Error", "Outer Service responses very slowly",  ex.getMessage(), new Date());
+        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).contentType(MediaType.APPLICATION_JSON).body(message);
     }
 }

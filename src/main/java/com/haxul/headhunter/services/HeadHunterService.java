@@ -14,11 +14,9 @@ import com.haxul.headhunter.networkClients.HeadHunterRestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
@@ -59,16 +57,30 @@ public class HeadHunterService {
         List<VacancyHeadHunter> vacanciesWithoutExperienceList = vacanciesFuture
                 .get()
                 .stream()
-                .filter( vacancy -> vacancy.getSalary() != null)
+                .filter(vacancy -> vacancy.getSalary() != null)
                 .collect(Collectors.toList());
 
 
         /*
-            fetch experience info for each vacancy. Then transform data list to map (vacancyId -> experience)
+            fetch experience info for each vacancy.
          */
-        Map<Integer, ExperienceHeadhunter> vacancyWithExperienceMap = headHunterRestClient
+
+
+        var notUniqueDetailedVacancyList  = headHunterRestClient
                 .getListOfDetailedVacancies(vacanciesWithoutExperienceList)
-                .get()
+                .get(60, TimeUnit.SECONDS);
+
+        /*
+            make list be unique. We are doing because  sometimes Headhunter Api returns vacancies with the same id
+         */
+            
+        Set<VacancyDetailedPageHeadHunter> uniqueDetailedVacancies = new HashSet<>(notUniqueDetailedVacancyList);
+
+        /*
+            Then transform data list to map (vacancyId -> experience)
+         */
+
+        Map<Integer, ExperienceHeadhunter> vacancyWithExperienceMap = uniqueDetailedVacancies
                 .stream()
                 .collect(Collectors.toMap(VacancyDetailedPageHeadHunter::getId, VacancyDetailedPageHeadHunter::getExperience));
 
@@ -79,6 +91,13 @@ public class HeadHunterService {
                 .stream()
                 .peek(vacancy -> vacancy.setExperience(vacancyWithExperienceMap.get(vacancy.getId())))
                 .collect(Collectors.toList());
+
+        /*
+            if list is empty it is no sense to continue info collecting
+         */
+
+        if (vacanciesWithoutExperienceList.isEmpty()) return new LinkedList<>();
+
         /*
             group vacancies by their experience
          */

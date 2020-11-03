@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,8 +56,16 @@ public class HeadHunterRestClient {
     private CompletableFuture<VacancyDetailedPageHeadHunter> getDetailedVacancyDataById(int id) {
         final String url = baseUrl + "vacancies/" + id;
         return CompletableFuture
-                .supplyAsync(() -> restTemplate.getForObject(url, VacancyDetailedPageHeadHunter.class))
-                .exceptionally(appUtils::handleError);
+                .supplyAsync(() -> {
+                    try {
+                        Thread.sleep(500);
+                        return restTemplate.getForObject(url, VacancyDetailedPageHeadHunter.class);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .exceptionally(appUtils::logError);
     }
 
 
