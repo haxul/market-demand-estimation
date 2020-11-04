@@ -6,12 +6,13 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "market_demands")
-public class MarketDemand {
+public class MarketDemand implements Serializable {
 
     @Id
     @GeneratedValue(generator = "sequence-generator")

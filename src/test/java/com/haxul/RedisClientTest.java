@@ -5,6 +5,7 @@ package com.haxul;
 import com.haxul.cacheHandler.RedisClient;
 import com.haxul.exchangeCurrency.entities.CurrencyRate;
 import com.haxul.exchangeCurrency.models.CurrenciesExchanges;
+import com.haxul.headhunter.entities.MarketDemand;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import redis.clients.jedis.Jedis;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,6 +31,25 @@ public class RedisClientTest {
     private RedisClient redisClient;
 
 
+    @Test
+    public void testSerializeList() {
+        var one = new MarketDemand();
+        one.setId(1L);
+
+        var two = new MarketDemand();
+        two.setId(2L);
+
+        List<MarketDemand> list = new LinkedList<>();
+        list.add(one);
+        list.add(two);
+
+        redisClient.set("list", list);
+        List<MarketDemand> result = redisClient.getList("list", MarketDemand.class);
+        assertEquals(2, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(2L, result.get(1).getId());
+
+    }
 
     @Test
     public void testSerialize() {
