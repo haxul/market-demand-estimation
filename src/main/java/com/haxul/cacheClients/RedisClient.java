@@ -1,4 +1,4 @@
-package com.haxul.cacheHandler;
+package com.haxul.cacheClients;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,6 @@ public class RedisClient {
 
     public void set(String key, Object object) {
         try {
-            if (key == null || object == null) return;
             jedis.set(key.getBytes(), serialize(object));
         } catch (Exception e) {
             log.error("RedisClient error: " + e);
@@ -29,7 +28,6 @@ public class RedisClient {
 
     public <A> List<A> getList(String key, Class<A> clazz) {
         try {
-            if (key == null || clazz == null) throw new ClassCastException();
             Object cache = tryGetCachedObject(key);
             if (cache == null) return null;
             return (List<A>) cache;
@@ -43,7 +41,6 @@ public class RedisClient {
 
     public <A> A get(String key, Class<A> clazz) {
         try {
-            if (key == null || clazz == null) throw new ClassCastException();
             Object cache = tryGetCachedObject(key);
             return cache == null ? null : clazz.cast(cache);
         } catch (ClassCastException e) {

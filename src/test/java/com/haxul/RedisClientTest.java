@@ -2,18 +2,16 @@
 package com.haxul;
 
 
-import com.haxul.cacheHandler.RedisClient;
+import com.haxul.cacheClients.RedisClient;
 import com.haxul.exchangeCurrency.entities.CurrencyRate;
 import com.haxul.exchangeCurrency.models.CurrenciesExchanges;
 import com.haxul.headhunter.entities.MarketDemand;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import redis.clients.jedis.Jedis;
 
 import java.util.Date;
 import java.util.LinkedList;
