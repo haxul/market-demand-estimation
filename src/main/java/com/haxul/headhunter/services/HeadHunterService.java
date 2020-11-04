@@ -44,6 +44,7 @@ public class HeadHunterService {
      */
 
     // TODO write test
+    // TODO add cache
     @Transactional
     public List<MarketDemand> findMarketDemandsForToday(String position, City city, String source) throws InterruptedException, ExecutionException, TimeoutException {
 
