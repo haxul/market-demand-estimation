@@ -1,6 +1,8 @@
 package com.haxul.headhunter;
 
 
+import com.haxul.exchangeCurrency.entities.CurrencyRate;
+import com.haxul.exchangeCurrency.models.CurrenciesExchanges;
 import com.haxul.exchangeCurrency.services.ExchangeCurrencyService;
 import com.haxul.headhunter.entities.MarketDemand;
 import com.haxul.headhunter.models.area.City;
@@ -10,6 +12,7 @@ import com.haxul.headhunter.models.hhApiResponses.SalaryHeadHunter;
 import com.haxul.headhunter.models.hhApiResponses.VacancyDetailedPageHeadHunter;
 import com.haxul.headhunter.models.hhApiResponses.VacancyHeadHunter;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
+import com.haxul.headhunter.repositories.HeadHunterRepository;
 import com.haxul.headhunter.services.HeadHunterService;
 import com.haxul.utils.AppUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -53,6 +57,9 @@ public class HeadHunterServiceTest {
 
     @MockBean
     private ExchangeCurrencyService exchangeCurrencyService;
+
+    @MockBean
+    private HeadHunterRepository headHunterRepository;
 
     @BeforeEach
     public void executedBeforeEach() {
@@ -125,7 +132,17 @@ public class HeadHunterServiceTest {
 
         var listCompletableFuture = CompletableFuture.completedFuture(vacancies);
         when(headHunterRestClient.findVacanciesAsync(anyString(),anyInt(),anyInt(), anyList())).thenReturn(listCompletableFuture);
-        when(exchangeCurrencyService.getUsdToRubRate()).thenReturn(80.0);
+        when(exchangeCurrencyService.getUsdToRubRate()).thenReturn(80.0f);
+        when(exchangeCurrencyService.findCurrencyRateByExchangedCurrenciesAndDate(any(), any())).thenReturn(null);
+        when(headHunterRepository.findByPositionAndCityAndAtMoment(anyString(), any(), any())).thenReturn(new LinkedList<>());
+
+        CurrencyRate currencyRate = new CurrencyRate();
+        currencyRate.setExchangedCurrencies(CurrenciesExchanges.RUB_IN_USD);
+        currencyRate.setRate(0.0f);
+        currencyRate.setDate(new Date());
+
+
+        when(exchangeCurrencyService.findByExchangedCurrencies(any())).thenReturn(currencyRate);
 
         var detailedPage0 = new VacancyDetailedPageHeadHunter();
         detailedPage0.setId(0);
