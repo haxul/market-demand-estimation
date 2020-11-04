@@ -75,7 +75,7 @@ public class HeadHunterService {
 
         // TODO refactor this block after test are written
 
-        CurrencyRate relevantdRate = exchangeCurrencyService.findCurrencyRateByExchangedCurrenciesAndDate(RUB_IN_USD, new Date());
+        CurrencyRate relevantRate = exchangeCurrencyService.findCurrencyRateByExchangedCurrenciesAndDate(RUB_IN_USD, new Date());
         Float usdToRubRate = 0.0f;
 
         if (relevantRate == null) {
