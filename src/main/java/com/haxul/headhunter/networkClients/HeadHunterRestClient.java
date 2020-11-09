@@ -56,15 +56,7 @@ public class HeadHunterRestClient {
     private CompletableFuture<VacancyDetailedPageHeadHunter> getDetailedVacancyDataById(int id) {
         final String url = baseUrl + "vacancies/" + id;
         return CompletableFuture
-                .supplyAsync(() -> {
-                    try {
-                        Thread.sleep(500);
-                        return restTemplate.getForObject(url, VacancyDetailedPageHeadHunter.class);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                })
+                .supplyAsync(() -> restTemplate.getForObject(url, VacancyDetailedPageHeadHunter.class))
                 .exceptionally(appUtils::logError);
     }
 
