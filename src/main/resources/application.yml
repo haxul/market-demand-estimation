@@ -10,7 +10,7 @@ currency:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/estimation-db
+    url: jdbc:postgresql://${CONTAINER_DB:localhost}:5432/estimation-db
     username: haxul
     password: password
     driver-class-name: org.postgresql.Driver
@@ -21,3 +21,7 @@ spring:
 
   liquibase:
     change-log: classpath:db/db.changelog-master.xml
+
+redis:
+  port: 6379
+  host: ${REDIS_CONTAINER:localhost}

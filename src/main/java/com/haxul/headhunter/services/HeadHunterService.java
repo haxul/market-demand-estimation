@@ -47,8 +47,6 @@ public class HeadHunterService {
      * @return list of market demands grouped by experience valued in years. Values are relevant for now
      */
 
-    // TODO write test
-    // TODO add cache
     @Transactional
     public List<MarketDemand> findMarketDemandsForToday(String position, City city, String source) throws InterruptedException, ExecutionException, TimeoutException {
 
@@ -89,7 +87,6 @@ public class HeadHunterService {
             if it does not,  fetch info about  USD to RUB rate from the internet and save it into postgres
          */
 
-        // TODO refactor this block after test are written
 
         CurrencyRate relevantRate = exchangeCurrencyService.findCurrencyRateByExchangedCurrenciesAndDate(RUB_IN_USD, new Date());
         Float currentUsdToRubRate = 0.0f;

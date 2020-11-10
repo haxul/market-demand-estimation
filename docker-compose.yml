@@ -2,7 +2,7 @@ version: "3"
 services:
   postgresdb:
     image: postgres:12.3
-    container_name: postgres-database
+    container_name: postgres
     volumes:
       - ./pg_data:/var/lib/postgresql/data/pgdata
     environment:
@@ -12,11 +12,23 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - 5432:5432
+    restart: always
+  webapp:
+    build: ./
+    container_name: springbootapp
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgresdb
+      - redis
+    environment:
+      CONTAINER_DB: postgresdb
+      REDIS_CONTAINER: redis
   redis:
     image: redis:6.0
+    container_name: redis
     command: ["sh", "-c", "exec redis-server --requirepass \"redis_password\""]
     volumes:
-      - ./redis-data:/var/lib/redis
       - ./redis.conf:/usr/local/etc/redis/redis.conf
     ports:
       - 6379:6379
