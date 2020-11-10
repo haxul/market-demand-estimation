@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Slf4j
@@ -18,9 +19,15 @@ public class RedisClient {
 
     private final Jedis jedis;
 
+    public void clearByPattern(String pattern) {
+        Set<String> keys = jedis.keys(pattern);
+        keys.forEach(jedis::del);
+    }
+
     public void set(String key, Object object) {
         try {
             jedis.set(key.getBytes(), serialize(object));
+            jedis.expire(key.getBytes(), 60 * 60 * 24);
         } catch (Exception e) {
             log.error("RedisClient error: " + e);
         }

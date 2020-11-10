@@ -1,5 +1,6 @@
 package com.haxul.headhunter.services;
 
+import com.haxul.cacheClients.RedisClient;
 import com.haxul.exchangeCurrency.entities.CurrencyRate;
 import com.haxul.exchangeCurrency.services.ExchangeCurrencyService;
 import com.haxul.headhunter.entities.MarketDemand;
@@ -13,6 +14,7 @@ import com.haxul.headhunter.models.hhApiResponses.VacancyDetailedPageHeadHunter;
 import com.haxul.headhunter.models.hhApiResponses.VacancyHeadHunter;
 import com.haxul.headhunter.networkClients.HeadHunterRestClient;
 import com.haxul.headhunter.repositories.HeadHunterRepository;
+import com.haxul.utils.AppUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,8 @@ public class HeadHunterService {
     private final HeadHunterRestClient headHunterRestClient;
     private final ExchangeCurrencyService exchangeCurrencyService;
     private final HeadHunterRepository headHunterRepository;
+    private final RedisClient cacheClient;
+    private final AppUtils appUtils;
 
     @Value("${headhunter.taxRatePercentage}")
     private String taxRatePercentage;
@@ -49,6 +53,17 @@ public class HeadHunterService {
     public List<MarketDemand> findMarketDemandsForToday(String position, City city, String source) throws InterruptedException, ExecutionException, TimeoutException {
 
         /*
+            check cache for market demands
+         */
+
+        final String DEMANDS = "demands:";
+        String date = appUtils.getDateKey();
+        String relevantCacheKey = DEMANDS + date;
+        List<MarketDemand> cache = cacheClient.getList(relevantCacheKey, MarketDemand.class);
+
+        if (cache != null) return cache;
+
+        /*
             check if data we need exists in postgres and if it does, return it
          */
 
@@ -57,6 +72,7 @@ public class HeadHunterService {
         if (!existedMarketDemandsList.isEmpty()) {
 
             existedMarketDemandsList.sort((a, b) -> Integer.compare(b.getMinYearExperience(), a.getMinYearExperience()));
+            cacheClient.set(relevantCacheKey, existedMarketDemandsList);
             return existedMarketDemandsList;
         }
 
@@ -76,14 +92,14 @@ public class HeadHunterService {
         // TODO refactor this block after test are written
 
         CurrencyRate relevantRate = exchangeCurrencyService.findCurrencyRateByExchangedCurrenciesAndDate(RUB_IN_USD, new Date());
-        Float usdToRubRate = 0.0f;
+        Float currentUsdToRubRate = 0.0f;
 
         if (relevantRate == null) {
-            usdToRubRate = exchangeCurrencyService.getUsdToRubRate();
+            currentUsdToRubRate = exchangeCurrencyService.getUsdToRubRate();
             CurrencyRate oldRate = exchangeCurrencyService.findByExchangedCurrencies(RUB_IN_USD);
-            if (oldRate == null) exchangeCurrencyService.createCurrencyRate(usdToRubRate, RUB_IN_USD);
-            else exchangeCurrencyService.updateCurrencyRate(oldRate, usdToRubRate);
-        } else usdToRubRate = relevantRate.getRate();
+            if (oldRate == null) exchangeCurrencyService.createCurrencyRate(currentUsdToRubRate, RUB_IN_USD);
+            else exchangeCurrencyService.updateCurrencyRate(oldRate, currentUsdToRubRate);
+        } else currentUsdToRubRate = relevantRate.getRate();
 
         /*
             complete vacancies future and filter vacancies which have salary equaled null
@@ -157,7 +173,7 @@ public class HeadHunterService {
                     .stream()
                     .filter(vacancy -> vacancy.getSalary().getCurrency() != null)
                     .collect(Collectors.toList());
-            int averageRubGrossSalary = computeAverageRubledGrossSalaryForVacancyList(vacanciesWithDefinedCurrencyType, usdToRubRate);
+            int averageRubGrossSalary = computeAverageRubledGrossSalaryForVacancyList(vacanciesWithDefinedCurrencyType, currentUsdToRubRate);
             demand.setAverageRubGrossSalary(averageRubGrossSalary);
             demand.setSource(source);
             demands.add(demand);
@@ -167,6 +183,7 @@ public class HeadHunterService {
             headHunterRepository.save(demand);
         }
         demands.sort((a, b) -> Integer.compare(b.getMinYearExperience(), a.getMinYearExperience()));
+        cacheClient.set(relevantCacheKey, demands);
         return demands;
     }
 

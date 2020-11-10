@@ -3,6 +3,7 @@ package com.haxul.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -11,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 public class AppUtils {
 
     public <T> T logError(Throwable e) {
-      log.error("Error: " + e);
-      return null;
+        log.error("Error: " + e);
+        return null;
     }
 
     public <T> T resolveFutureOrGetNull(CompletableFuture<T> future, int timout) {
@@ -22,5 +23,13 @@ public class AppUtils {
             log.error("Error: " + e);
             return null;
         }
+    }
+
+    public String getDateKey() {
+        LocalDate curDate = LocalDate.now();
+        int day = curDate.getDayOfMonth();
+        int month = curDate.getMonth().getValue();
+        int year = curDate.getYear();
+        return day + "-" + month + "-" + year;
     }
 }

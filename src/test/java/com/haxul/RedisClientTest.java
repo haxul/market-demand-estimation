@@ -50,6 +50,37 @@ public class RedisClientTest {
     }
 
     @Test
+    public void testFlushAll() {
+        var one = new MarketDemand();
+        one.setId(1L);
+
+        var two = new MarketDemand();
+        two.setId(2L);
+
+        List<MarketDemand> list = new LinkedList<>();
+        list.add(one);
+        list.add(two);
+
+        redisClient.set("demands:10-10-10", list);
+
+        var three = new MarketDemand();
+        three.setId(100L);
+
+        List<MarketDemand> anotherList = new LinkedList<>();
+        anotherList.add(three);
+        redisClient.set("test", anotherList);
+
+        redisClient.clearByPattern("demands:*");
+
+        List<MarketDemand> result = redisClient.getList("demands:10-10-10", MarketDemand.class);
+        List<MarketDemand> anotherResult = redisClient.getList("test", MarketDemand.class);
+
+        assertNull(result);
+        assertNotNull(anotherResult);
+        assertEquals(100L, anotherResult.get(0).getId());
+    }
+
+    @Test
     public void testSerialize() {
 
         CurrencyRate currencyRate = new CurrencyRate();
