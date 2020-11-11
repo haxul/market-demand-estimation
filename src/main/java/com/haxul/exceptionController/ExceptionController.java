@@ -1,5 +1,6 @@
 package com.haxul.exceptionController;
 
+import com.haxul.analytics.exceptions.UnSupportedDateTypeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
@@ -49,5 +50,11 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleTimeoutException(Exception ex, WebRequest request) {
         ErrorMessage message = new ErrorMessage("Error", "Outer Service responses very slowly",  ex.getMessage(), new Date());
         return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).contentType(MediaType.APPLICATION_JSON).body(message);
+    }
+
+    @ExceptionHandler(value = {UnSupportedDateTypeException.class})
+    public ResponseEntity<Object> handleDateTypeException(Exception ex, WebRequest request) {
+        ErrorMessage message = new ErrorMessage("Error", "only month or day supported as datatype",  ex.getMessage(), new Date());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(message);
     }
 }

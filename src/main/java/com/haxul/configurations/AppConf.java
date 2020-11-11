@@ -23,8 +23,6 @@ public class AppConf {
 
     @Bean
     public Jedis jedisClient() {
-        Jedis jedis = new Jedis("redis://" + host + ":" + port);
-        jedis.auth("redis_password");
-        return jedis;
+        return new Jedis("redis://" + host + ":" + port);
     }
 }

@@ -1,6 +1,7 @@
 package com.haxul.headhunter;
 
 
+import com.haxul.cacheClients.RedisClient;
 import com.haxul.exchangeCurrency.entities.CurrencyRate;
 import com.haxul.exchangeCurrency.models.CurrenciesExchanges;
 import com.haxul.exchangeCurrency.services.ExchangeCurrencyService;
@@ -26,6 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
+import redis.clients.jedis.Jedis;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -39,6 +41,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -53,6 +56,9 @@ public class HeadHunterServiceTest {
     private HeadHunterService headHunterService;
 
     @MockBean
+    RedisClient redisClient;
+
+    @MockBean
     private HeadHunterRestClient headHunterRestClient;
 
     @MockBean
@@ -64,6 +70,8 @@ public class HeadHunterServiceTest {
     @BeforeEach
     public void executedBeforeEach() {
         MockitoAnnotations.openMocks(this);
+        when(redisClient.getList(anyString(), any())).thenReturn(null);
+        when(redisClient.get(anyString(), any())).thenReturn(null);
     }
 
 
