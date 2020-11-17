@@ -1,12 +1,14 @@
 package com.haxul.analytics.dto;
 
 import com.haxul.analytics.Direction;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Difference {
 
-    private short percentage;
+    private int percentage;
     private Direction direction;
     private int daysAgo;
 

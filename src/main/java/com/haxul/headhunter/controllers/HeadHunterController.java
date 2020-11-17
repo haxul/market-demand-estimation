@@ -26,7 +26,7 @@ public class HeadHunterController {
 
     @GetMapping
     public DemandResponse getMarketDemandsByPositionAndCity(@RequestParam String position, @RequestParam City city) throws InterruptedException, ExecutionException, TimeoutException {
-        List<MarketDemand> demands = headHunterService.findMarketDemandsForToday(position, city, "Head Hunter");
+        List<MarketDemand> demands = headHunterService.findMarketDemandsForToday(position, city, "HeadHunter");
         var demandResponse = new DemandResponse();
         demandResponse.setItems(demands);
         int found = 0;

@@ -1,5 +1,5 @@
 package com.haxul.analytics;
 
 public enum Direction {
-    UP, DOWN
+    UP, DOWN, NO_CHANGE
 }
