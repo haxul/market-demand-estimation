@@ -47,6 +47,7 @@ public class AnalyticService {
     private Difference computeDifference(int days, City city, String position) {
         List<MarketDemand> demands = headHunterRepository.findAllAfterDays(position, city.toString(), days);
         if (demands.isEmpty()) return new Difference(0, Direction.NO_CHANGE, days);
+
         List<MarketDemand> demandsNotToday = new LinkedList<>();
         List<MarketDemand> demandsToday = new LinkedList<>();
 
