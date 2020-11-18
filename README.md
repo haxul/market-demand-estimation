@@ -2,5 +2,5 @@
 It is easy to find out the market demand in your city
 
 ### run app
-start.bs - server
-start.py - client
+- start.bs - server
+- start.py - client
